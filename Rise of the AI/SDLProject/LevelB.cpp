@@ -48,12 +48,7 @@ void LevelB::initialise()
     m_game_state.next_scene_id = -1;
 
     GLuint map_texture_id = Utility::load_texture("assets/B_tileset.png");
-    m_game_state.map = new Map(LEVELB_WIDTH, LEVELB_HEIGHT,
-                               LEVELB_DATA,
-                               map_texture_id,
-                               1.0f,    // tile size
-                               5,       // tile_count_x
-                               10);      // tile_count_y
+    m_game_state.map = new Map(LEVELB_WIDTH, LEVELB_HEIGHT, LEVELB_DATA, map_texture_id, 1.0f, 5, 10);
 
     // Player
     GLuint player_texture_id = Utility::load_texture("assets/GreenPlayer.png");
@@ -65,9 +60,22 @@ void LevelB::initialise()
     };
     
     glm::vec3 accel(0.0f, -9.81f, 0.0f);
-    m_game_state.player = new Entity(player_texture_id, 3.0f, accel, 7.0f,
-                                     player_walking, 0.0f, 4, 0, 4, 4,
-                                     1.0f, 1.0f, PLAYER);
+    m_game_state.player = new Entity(
+        player_texture_id,  // texture id
+        3.0f,               // speed
+        accel,              // acceleration
+        7.0f,               // jumping power
+        player_walking,     // animation index sets
+        0.0f,               // animation time
+        4,                  // animation frame amount
+        0,                  // current animation index
+        4,                  // animation column amount
+        4,                  // animation row amount
+        1.0f,               // width
+        1.0f,               // height
+        PLAYER              // entity type
+    );
+    
     m_game_state.player->set_position(glm::vec3(2.0f, 0.0f, 0.0f));
 
     // Enemies
@@ -98,12 +106,10 @@ void LevelB::initialise()
 
 void LevelB::update(float delta_time)
 {
-    m_game_state.player->update(delta_time, m_game_state.player, m_game_state.enemies,
-                                ENEMY_COUNT, m_game_state.map);
+    m_game_state.player->update(delta_time, m_game_state.player, m_game_state.enemies, ENEMY_COUNT, m_game_state.map);
 
     for(int i = 0; i < ENEMY_COUNT; i++){
-        m_game_state.enemies[i].update(delta_time, m_game_state.player, nullptr, 0,
-                                       m_game_state.map);
+        m_game_state.enemies[i].update(delta_time, m_game_state.player, nullptr, 0, m_game_state.map);
     }
 
     for(int i = 0; i < ENEMY_COUNT; i++){
@@ -147,8 +153,6 @@ void LevelB::render(ShaderProgram *program)
     for(int i = 0; i < ENEMY_COUNT; i++){
         m_game_state.enemies[i].render(program);
     }
-    Utility::draw_text(program, Utility::load_texture("assets/font1.png"),
-                       "Lives: " + std::to_string(g_player_lives), 0.5f, -0.25f,
-                       glm::vec3(5.0f, -2.0f, 0.0f));
+    Utility::draw_text(program, Utility::load_texture("assets/font1.png"), "Lives: " + std::to_string(g_player_lives), 0.5f, -0.25f, glm::vec3(5.0f, -2.0f, 0.0f));
 }
 
